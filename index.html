@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROBLOX.RU | Авторизация</title>
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <img src="images/roblox-logo.png" alt="Roblox Logo" class="logo">
+        <div class="auth-box" id="authBox">
+            <h2>Войдите в аккаунт</h2>
+            <form class="auth-form" id="loginForm">
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Логин" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Пароль" required>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <button type="submit" class="login-button">Войти</button>
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+            <p class="disclaimer">
+                *Неофициальный фанатский проект. Roblox™ — торговая марка Roblox Corporation.
+            </p>
+        </div>
+    </div>
+
+    <div class="legal-notice">
+        <p>⚠️ Этот сайт не связан с Roblox Corporation. <a href="https://www.roblox.com" target="_blank">Официальный сайт</a></p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const authBox = document.getElementById('authBox');
+            const errorElement = document.getElementById('errorMessage');
+            const submitButton = this.querySelector('button[type="submit"]');
+            const progressBar = document.getElementById('progressBar');
+            const formData = new FormData(this);
+
+            submitButton.disabled = true;
+            errorElement.style.color = '#000000';
+            errorElement.textContent = 'Проверяем данные';
+            errorElement.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressBar.style.display = 'block';
+            authBox.classList.remove('shake-animation');
+            const delay = 1000 + Math.random() * 1000;
+            
+            let dots = 0;
+            const loadingInterval = setInterval(() => {
+                dots = (dots + 1) % 4;
+                errorElement.textContent = 'Проверяем данные' + '.'.repeat(dots);
+            }, 500);
+
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                progressBar.style.width = `${progress}%`;
+                if (progress >= 100) clearInterval(progressInterval);
+            }, delay / 50);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            clearInterval(loadingInterval);
+            clearInterval(progressInterval);
+            errorElement.style.color = '#ff4444';
+            errorElement.textContent = 'Неверный логин или пароль!';
+            progressBar.style.display = 'none';
+            authBox.classList.add('shake-animation');
+            setTimeout(() => {
+                authBox.classList.remove('shake-animation');
+                errorElement.style.display = 'none';
+                submitButton.disabled = false;
+            }, 2000);
+        });
+        window.addEventListener('load', () => {
+            fetch('https://api.roblox.ru/check-session', { 
+                method: 'GET',
+                credentials: 'include'
+            }).catch(() => {});
+        });
+    </script>
+</body>
+</html>
